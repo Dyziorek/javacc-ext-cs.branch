@@ -1,0 +1,569 @@
+
+options {
+  JAVA_UNICODE_ESCAPE = false;
+  ERROR_REPORTING = false;
+  STATIC = false;
+  IGNORE_CASE = true;
+  NAMESPACE="HtmlAgilityPack.CSS";
+  OUTPUT_LANGUAGE="cs";
+}
+
+
+PARSER_BEGIN(CSSParser)
+
+using System;
+using System.IO;
+using System.Collections;
+using System.Collections.Generic;
+
+/**
+ * Grammar to parse CSS Style
+ * @author Sreenivasa Viswanadha - Simplified and enhanced for 1.5
+ */
+public class CSSParser
+{
+    Dictionary<String , List<StyleProperty>> _styleData;
+    String _styleDeclarator = "";
+    String _styleValue = "";
+    String _styleSelector = "";
+    String _complexElemName = "";
+    List<StyleProperty> _currStyleProps;
+    public CSSParser()
+    {
+        _styleData = new Dictionary<String , List<StyleProperty>>();
+        _currStyleProps = new List<StyleProperty>();
+    }
+
+	public Dictionary<String , List<StyleProperty>> CSSStyleList
+	{
+		get { 
+			if (_styleData.Count > 0)
+			{
+				return _styleData; 
+			}
+			else
+			{
+				return null;
+			}
+		}
+	}
+
+	public List<StyleProperty> StyleInfo
+	{
+		get { return _currStyleProps; }
+	}
+}
+
+PARSER_END(CSSParser)
+
+/* LEXER RULES */
+
+// White space to ignore
+SPECIAL_TOKEN:
+{
+  " "
+| "\t"
+| "\n"
+| "\r"
+| "\f"
+}
+
+// Comments
+MORE:
+{
+	< "<!--" ~["-"] > : IN_MULTI_COMMENT
+}
+
+SPECIAL_TOKEN:
+{
+  <SINGLE_LINE_COMMENT: "/*" (~["\n", "\r"])* ("\n" | "\r" | "\r\n")? >
+}
+
+<IN_MULTI_COMMENT>
+SPECIAL_TOKEN:
+{
+	<MULTI_COMMENT: "-->" > : DEFAULT
+}
+
+
+TOKEN:
+{
+	<CHARSET_SYM: "@charset ">
+    |<IMPORT_SYM: "@import" >
+    |<MEDIA_SYM: "@media" >
+    |<PAGE_SYM: "@page" >
+    |<SEPARATOR: ";">
+}
+
+
+TOKEN:
+{
+    <INCLUDES: "~=">
+   |<DASHMATCH: "|=">
+   |<PLUS: "+">
+   |<MINUS: "-">
+   |<LPAREN: "(">
+   |<RPAREN: ")">
+   |<LBRACE: "{">
+   |<RBRACE: "}">
+   |<LBRACKET: "[">
+   |<RBRACKET: "]">
+   |<COMMA: ",">
+   |<DOT: "."> 
+   |<COLON: ":">
+   |<SLASH: "/">
+   |<ALLGROUP: "*">
+   |<GT: ">">
+
+}
+
+/* LITERALS */
+
+TOKEN :
+{
+  < IDENT: (["-"])? <LETTER> (<PART_LETTER>)* >
+|
+  < HASH: "#" (<PART_LETTER>)+ >
+|
+ <IMPORTANT_SYM: "!" (<PART_LETTER>)* "important" > 
+|
+  < #LETTER:
+      [  
+         "A"-"Z",
+         "_",
+         "a"-"z"
+      ]
+  >
+|
+  < #PART_LETTER:
+      [  
+         "0"-"9",
+         "A"-"Z",
+         "_", "-",
+         "a"-"z"
+      ]
+  >
+}
+
+
+TOKEN :
+{
+
+ <NUMBER: <NUMBER_LITERAL>  (["l"])?>
+ |
+ <EMS: <NUMBER_LITERAL> "em" >
+ |
+ <EXS: <NUMBER_LITERAL> "ex" >
+ |
+ < PERCENTAGE: <NUMBER_LITERAL> "%" >
+|
+  < LENGTH: 
+      <NUMBER_LITERAL> "px"
+    | <NUMBER_LITERAL> "cm" 
+    | <NUMBER_LITERAL> "mm" 
+    | <NUMBER_LITERAL> "in" 
+    | <NUMBER_LITERAL> "pt" 
+    | <NUMBER_LITERAL> "pc" >
+|
+  < ANGLE: 
+      <NUMBER_LITERAL> "deg" 
+    | <NUMBER_LITERAL> "rad" 
+    | <NUMBER_LITERAL>"grad" >
+|
+  < TIME: 
+    <NUMBER_LITERAL> "s" |
+    <NUMBER_LITERAL> "ms" >
+|
+ < FREQ: 
+    <NUMBER_LITERAL> "hz" |
+    <NUMBER_LITERAL> "khz" >
+|
+< #NUMBER_LITERAL: ["0"-"9"] (["0"-"9"])* (".")? (["0"-"9"])*  >
+|
+<URI: "url(" (<URLCHAR_LITERAL> | <URLSTRING_LITERAL>) ")">
+|
+<STRING : < STRING_LITERAL> | <CHAR_LITERAL> >
+|
+< #CHAR_LITERAL:
+      "'"
+      (   (~["'","\\","\n","\r"])
+        | ("\\"
+            ( ["n","t","b","r","f","\\","'","\""]
+            | ["0"-"7"] ( ["0"-"7"] )?
+            | ["0"-"3"] ["0"-"7"] ["0"-"7"]
+            )
+          )
+        | ("\\u"
+        	["0"-"9","A"-"F","a"-"f"]
+        	["0"-"9","A"-"F","a"-"f"]
+        	["0"-"9","A"-"F","a"-"f"]
+        	["0"-"9","A"-"F","a"-"f"]
+			["0"-"9","A"-"F","a"-"f"]
+			["0"-"9","A"-"F","a"-"f"]
+			["0"-"9","A"-"F","a"-"f"]
+			["0"-"9","A"-"F","a"-"f"]
+          )
+		| ("\\x"
+			["0"-"9","A"-"F","a"-"f"]
+        	["0"-"9","A"-"F","a"-"f"]
+        	["0"-"9","A"-"F","a"-"f"]
+        	["0"-"9","A"-"F","a"-"f"]
+		  )
+      )*
+      "'"
+  >
+|
+  < #STRING_LITERAL:
+      "\""
+      (   (~["\"","\\","\n","\r"])
+        | ("\\"
+            ( ["n","t","b","r","f","\\","'","\""]
+            | ["0"-"7"] ( ["0"-"7"] )?
+            | ["0"-"3"] ["0"-"7"] ["0"-"7"]
+            )
+          )
+        | ("\\u"
+        	["0"-"9","A"-"F","a"-"f"]
+        	["0"-"9","A"-"F","a"-"f"]
+        	["0"-"9","A"-"F","a"-"f"]
+        	["0"-"9","A"-"F","a"-"f"]
+          )
+      )*
+      "\""
+  >
+  |
+  < #URLCHAR_LITERAL:
+      "'"
+      (   (~["'","\\","\n","\r"])
+        | ("\\"
+            ( ["n","t","b","r","f","\\","'","\""]
+            | ["0"-"7"] ( ["0"-"7"] )?
+            | ["0"-"3"] ["0"-"7"] ["0"-"7"]
+            )
+          )
+        | ("\\u"
+        	["0"-"9","A"-"F","a"-"f"]
+        	["0"-"9","A"-"F","a"-"f"]
+        	["0"-"9","A"-"F","a"-"f"]
+        	["0"-"9","A"-"F","a"-"f"]
+			["0"-"9","A"-"F","a"-"f"]
+			["0"-"9","A"-"F","a"-"f"]
+			["0"-"9","A"-"F","a"-"f"]
+			["0"-"9","A"-"F","a"-"f"]
+          )
+		| ("\\x"
+			["0"-"9","A"-"F","a"-"f"]
+        	["0"-"9","A"-"F","a"-"f"]
+        	["0"-"9","A"-"F","a"-"f"]
+        	["0"-"9","A"-"F","a"-"f"]
+		  )
+      )*
+      "'"
+  >
+|
+  < #URLSTRING_LITERAL:
+      "\""
+      (   (~["\"","\\","\n","\r"])
+        | ("\\"
+            ( ["n","t","b","r","f","\\","'","\""]
+            | ["0"-"7"] ( ["0"-"7"] )?
+            | ["0"-"3"] ["0"-"7"] ["0"-"7"]
+            )
+          )
+        | ("\\u"
+        	["0"-"9","A"-"F","a"-"f"]
+        	["0"-"9","A"-"F","a"-"f"]
+        	["0"-"9","A"-"F","a"-"f"]
+        	["0"-"9","A"-"F","a"-"f"]
+          )
+      )*
+      "\""
+  >
+}
+
+
+
+void stylesheet() :
+{
+}
+{
+    { 
+        _styleData = new Dictionary<String , List<StyleProperty>>();
+    }
+    [<CHARSET_SYM> <STRING> ";"] 
+    ( css_import()  | ruleset() | media() | page() )*
+	<EOF>
+}
+
+void singleStyle() :
+{}
+{
+    { 
+        if (_currStyleProps == null) 
+        {
+            _currStyleProps = new List<StyleProperty>(); 
+        }
+    }
+    declaration() ";" ( declaration() ";" )* <EOF>
+}
+
+
+void css_import() :
+{}
+{
+	<IMPORT_SYM> (<STRING>|<URI>) [media_list()] ";"
+
+}
+
+void media() :
+{}
+{
+	<MEDIA_SYM> media_list() "{" (ruleset())* "}"
+}
+
+void media_list() :
+{}
+{
+	<IDENT> [<COMMA> <IDENT>]
+}
+
+void page() :
+{}
+{
+	<PAGE_SYM> [pageID()] "{" declaration() (LOOKAHEAD(2) (";" declaration() )* | (";")) "}"
+}
+
+void pageID() :
+{}
+{
+	":" <IDENT>
+}
+
+
+void operator_expr() :
+{}
+{
+	"/" | ","
+}
+
+void combinator() :
+{}
+{
+	"+" | ">"
+}
+
+String unary_operator() :
+{
+    Token opID = null;
+}
+{
+  (opID = "-" | opID = "+")
+  {
+    return opID.ToString();
+  }
+}
+
+void ruleset() :
+{String styleNameSel;}
+{
+  { if (_currStyleProps == null) _currStyleProps = new List<StyleProperty>(); }
+  styleNameSel = selector() ( "," selector() )* "{" declaration()  (";" [declaration()] )*  "}"
+  {
+    _styleData[styleNameSel] = new List<StyleProperty>(_currStyleProps);
+    _currStyleProps.Clear();
+
+  }
+}
+
+String selector() :
+{ String StyleSelect;}
+{
+  StyleSelect = simple_selector() [ combinator() selector() /*| [ [combinator()] selector() ] */]
+  {
+     return StyleSelect;
+  }
+}
+
+String simple_selector() :
+{ 
+    _complexElemName = "";
+}
+{
+  (
+   element_name()  (  hashIdent() | class_ident() | attrib() | pseudo() )*  
+  | (hashIdent() | class_ident() | attrib() | pseudo() )+  [ (element_name())+ ]
+  )
+  {
+    String selector = _complexElemName;
+    return selector;
+  }
+}
+
+void hashIdent() :
+{ Token hashID; }
+{
+    hashID = <HASH>
+    {
+        if (_complexElemName == "")
+        {
+            _complexElemName = hashID.ToString();
+        }
+        else
+        {
+            _complexElemName = _complexElemName + " " + hashID.ToString();
+        }
+    }
+}
+
+void class_ident() :
+{  Token ID; Token dot; }
+{
+  dot = "." ID = <IDENT>
+  {
+     if (_complexElemName == "")
+        {
+            _complexElemName = dot.ToString() + ID.ToString();
+        }
+        else
+        {
+            _complexElemName = _complexElemName + dot.ToString() + ID.ToString();
+        }
+  }
+}
+ 
+void element_name() :
+{Token ID = null;}
+{
+  (ID = <IDENT> | ID = "*")
+  {
+    if (ID != null)
+    {
+        if (_complexElemName == "")
+        {
+            _complexElemName = ID.ToString();
+        }
+        else
+        {
+            _complexElemName = _complexElemName + " " + ID.ToString();
+        }
+    }
+  }
+}
+
+void attrib() :
+{}
+{
+  "[" <IDENT> [ ( "=" | <INCLUDES> | <DASHMATCH> ) ( <IDENT> | <STRING> ) ] "]"
+}
+
+void pseudo() :
+{
+    Token idx = null;
+    Token colonTok;
+    String functionEXPR = "";
+}
+{
+   (colonTok = ":" [LOOKAHEAD(2) idx = <IDENT> | functionEXPR = function_expr() ])
+   {
+        if (idx != null)
+        {
+           if (_complexElemName == "")
+            {
+                _complexElemName =  colonTok.ToString() + idx.ToString();
+            }
+            else
+            {
+                _complexElemName = _complexElemName + colonTok.ToString() + idx.ToString();
+            }
+        }
+        else if (functionEXPR != "")
+        {
+            if (_complexElemName == "")
+            {
+                _complexElemName =  colonTok.ToString() + functionEXPR;
+            }
+            else
+            {
+                _complexElemName = _complexElemName + colonTok.ToString() + functionEXPR;
+            }
+        }
+   }
+}
+
+void declaration() :
+{ Token idx = null;
+   }
+{
+  idx = <IDENT> ":" expr() [<IMPORTANT_SYM>]
+  {
+    _styleDeclarator = idx.ToString();
+    if (_styleValue != "" && _styleDeclarator != "")
+    {
+        StyleProperty styleData = new StyleProperty(_styleDeclarator, _styleValue);
+        _styleDeclarator = "";
+        _styleValue = "";
+        _currStyleProps.Add(styleData);
+    }
+  }
+}
+
+void expr() :
+{}
+{
+  term() ( [operator_expr()] term() )*
+}
+
+void term() :
+{ 
+String unaryOP = "";
+Token valueTok = null;
+}
+{
+  (
+    
+   [unaryOP = unary_operator()]  
+    (
+          valueTok = <NUMBER>  
+        | valueTok = <PERCENTAGE>  
+        | valueTok = <LENGTH>  
+        | valueTok = <EMS>  
+        | valueTok = <EXS>  
+        | valueTok = <ANGLE>  
+        | valueTok = <TIME>  
+        | valueTok = <FREQ>  
+        | valueTok = <STRING>  
+       | LOOKAHEAD(2) valueTok = <IDENT>  
+       | valueTok = <URI>  
+       | valueTok = <HASH> 
+       | function_expr()
+    )
+   )
+   {
+       if (_styleValue == "")
+       {
+            _styleValue += unaryOP + valueTok.ToString();
+       }
+   }
+}
+
+
+String function_expr() :
+{
+    Token ident;
+}
+{
+    (ident = <IDENT> "(" expr() ")")
+    {
+        return ident.ToString() + "(-function-)";
+    }
+}
+
+/*
+ * There is a constraint on the color that it must
+ * have either 3 or 6 hex-digits (i.e., [0-9a-fA-F])
+ * after the "#"; e.g., "#000" is OK, but "#abcd" is not.
+ 
+hexcolor
+  : HASH 
+  ;
+  */

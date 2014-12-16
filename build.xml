@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- You may freely edit this file. See commented blocks below for -->
+<!-- some examples of how to customize the build. -->
+<!-- (If you delete it and reopen the project it will be recreated.) -->
+<!-- By default, only the Clean and Build commands use this build script. -->
+<!-- Commands such as Run, Debug, and Test only use this build script if -->
+<!-- the Compile on Save feature is turned off for the project. -->
+<!-- You can turn off the Compile on Save (or Deploy on Save) setting -->
+<!-- in the project's Project Properties dialog box.-->
+<project name="javaCCBeta" default="default" basedir=".">
+    <description>Builds, tests, and runs the project javaCCBeta.</description>
+    <import file="nbproject/build-impl.xml"/>
+    <!--
+
+    There exist several targets which are by default empty and which can be 
+    used for execution of your tasks. These targets are usually executed 
+    before and after some main targets. They are: 
+
+      -pre-init:                 called before initialization of project properties
+      -post-init:                called after initialization of project properties
+      -pre-compile:              called before javac compilation
+      -post-compile:             called after javac compilation
+      -pre-compile-single:       called before javac compilation of single file
+      -post-compile-single:      called after javac compilation of single file
+      -pre-compile-test:         called before javac compilation of JUnit tests
+      -post-compile-test:        called after javac compilation of JUnit tests
+      -pre-compile-test-single:  called before javac compilation of single JUnit test
+      -post-compile-test-single: called after javac compilation of single JUunit test
+      -pre-jar:                  called before JAR building
+      -post-jar:                 called after JAR building
+      -post-clean:               called after cleaning build products
+
+    (Targets beginning with '-' are not intended to be called on their own.)
+
+    Example of inserting an obfuscator after compilation could look like this:
+
+        <target name="-post-compile">
+            <obfuscate>
+                <fileset dir="${build.classes.dir}"/>
+            </obfuscate>
+        </target>
+
+    For list of available properties check the imported 
+    nbproject/build-impl.xml file. 
+
+
+    Another way to customize the build is by overriding existing main targets.
+    The targets of interest are: 
+
+      -init-macrodef-javac:     defines macro for javac compilation
+      -init-macrodef-junit:     defines macro for junit execution
+      -init-macrodef-debug:     defines macro for class debugging
+      -init-macrodef-java:      defines macro for class execution
+      -do-jar-with-manifest:    JAR building (if you are using a manifest)
+      -do-jar-without-manifest: JAR building (if you are not using a manifest)
+      run:                      execution of project 
+      -javadoc-build:           Javadoc generation
+      test-report:              JUnit report generation
+
+    An example of overriding the target for project execution could look like this:
+
+        <target name="run" depends="javaCCBeta-impl.jar">
+            <exec dir="bin" executable="launcher.exe">
+                <arg file="${dist.jar}"/>
+            </exec>
+        </target>
+
+    Notice that the overridden target depends on the jar target and not only on 
+    the compile target as the regular run target does. Again, for a list of available 
+    properties which you can use, check the target you are overriding in the
+    nbproject/build-impl.xml file. 
+
+    -->
+    <target name="-pre-compile">
+      <java classname="javacc" classpath="${bootstrap.dir}\javacc.jar">
+        <arg value="-OUTPUT_DIRECTORY=${build.generated.sources.dir}\org\javacc\parser"/>
+        <arg value="${src.dir}\org\javacc\parser\JavaCC.jj"/>
+      </java>
+      <java classname="jjtree" classpath="${bootstrap.dir}\javacc.jar">
+        <arg value="-OUTPUT_DIRECTORY=${build.generated.sources.dir}\org\javacc\jjtree"/>
+        <arg value="${src.dir}\org\javacc\jjtree\jjtree.jjt"/>
+      </java>
+      <java classname="javacc" classpath="${bootstrap.dir}\javacc.jar">
+        <arg value="-OUTPUT_DIRECTORY=${build.generated.sources.dir}\org\javacc\jjtree"/>
+        <arg value="${build.generated.sources.dir}\jjtree\jjtree.jj"/>
+      </java>
+      <delete file="${build.generated.sources.dir}\org\javacc\parser\Token.java" />
+      
+      
+      
+    <delete file="${build.generated.sources.dir}\org\javacc\jjtree\ASTBNFNodeScope.java" />
+    <delete file="${build.generated.sources.dir}\org\javacc\jjtree\ASTCompilationUnit.java" />
+    <delete file="${build.generated.sources.dir}\org\javacc\jjtree\ASTExpansionNodeScope.java" />
+    <delete file="${build.generated.sources.dir}\org\javacc\jjtree\ASTGrammar.java" />
+    <delete file="${build.generated.sources.dir}\org\javacc\jjtree\ASTJavacode.java" />
+    <delete file="${build.generated.sources.dir}\org\javacc\jjtree\ASTJavacodeBody.java" />
+    <delete file="${build.generated.sources.dir}\org\javacc\jjtree\ASTLHS.java" />
+    <delete file="${build.generated.sources.dir}\org\javacc\jjtree\ASTNodeDescriptor.java" />
+    <delete file="${build.generated.sources.dir}\org\javacc\jjtree\ASTNodeDescriptorExpression.java" />
+    <delete file="${build.generated.sources.dir}\org\javacc\jjtree\ASTOptionBinding.java" />
+    <delete file="${build.generated.sources.dir}\org\javacc\jjtree\ASTOptions.java" />
+    <delete file="${build.generated.sources.dir}\org\javacc\jjtree\ASTProduction.java" />
+    <delete file="${build.generated.sources.dir}\org\javacc\jjtree\IO.java" />
+    <delete file="${build.generated.sources.dir}\org\javacc\jjtree\JJTree.java" />
+    <delete file="${build.generated.sources.dir}\org\javacc\jjtree\JJTreeGlobals.java" />
+    <delete file="${build.generated.sources.dir}\org\javacc\jjtree\JJTreeIOException.java" />
+    <delete file="${build.generated.sources.dir}\org\javacc\jjtree\JJTreeOptions.java" />
+    <delete file="${build.generated.sources.dir}\org\javacc\jjtree\JJTreeOptionsTest.java" />
+    <delete file="${build.generated.sources.dir}\org\javacc\jjtree\JJTreeState.java" />
+    <delete file="${build.generated.sources.dir}\org\javacc\jjtree\Main.java" />
+    <delete file="${build.generated.sources.dir}\org\javacc\jjtree\NodeFiles.java" />
+    <delete file="${build.generated.sources.dir}\org\javacc\jjtree\NodeScope.java" />
+    <delete file="${build.generated.sources.dir}\org\javacc\jjtree\SimpleNode.java" />
+    <delete file="${build.generated.sources.dir}\org\javacc\jjtree\Token.java" />
+    <delete file="${build.generated.sources.dir}\org\javacc\jjtree\TokenUtils.java" />
+
+    <delete file="${build.generated.sources.dir}\org\javacc\jjtree\ASTCharDescriptor.java" />
+    <delete file="${build.generated.sources.dir}\org\javacc\jjtree\ASTPrimaryExpression.java" />
+    <delete file="${build.generated.sources.dir}\org\javacc\jjtree\ASTProductions.java" />
+    <delete file="${build.generated.sources.dir}\org\javacc\jjtree\ASTREEOF.java" />
+    <delete file="${build.generated.sources.dir}\org\javacc\jjtree\ASTBNF.java" />
+    <delete file="${build.generated.sources.dir}\org\javacc\jjtree\ASTBNFAssignment.java" />
+    <delete file="${build.generated.sources.dir}\org\javacc\jjtree\ASTBNFChoice.java" />
+    <delete file="${build.generated.sources.dir}\org\javacc\jjtree\ASTBNFLookahead.java" />
+    <delete file="${build.generated.sources.dir}\org\javacc\jjtree\ASTBNFNonTerminal.java" />
+    <delete file="${build.generated.sources.dir}\org\javacc\jjtree\ASTBNFOneOrMore.java" />
+    <delete file="${build.generated.sources.dir}\org\javacc\jjtree\ASTBNFParenthesized.java" />
+    <delete file="${build.generated.sources.dir}\org\javacc\jjtree\ASTBNFSequence.java" />
+    <delete file="${build.generated.sources.dir}\org\javacc\jjtree\ASTBNFTryBlock.java" />
+    <delete file="${build.generated.sources.dir}\org\javacc\jjtree\ASTBNFZeroOrMore.java" />
+    <delete file="${build.generated.sources.dir}\org\javacc\jjtree\ASTBNFZeroOrOne.java" />
+    <delete file="${build.generated.sources.dir}\org\javacc\jjtree\ASTBNFCharDescriptor.java" />
+    <delete file="${build.generated.sources.dir}\org\javacc\jjtree\ASTBNFPrimaryExpression.java" />
+    <delete file="${build.generated.sources.dir}\org\javacc\jjtree\ASTRE.java" />
+    <delete file="${build.generated.sources.dir}\org\javacc\jjtree\ASTREChoice.java" />
+    <delete file="${build.generated.sources.dir}\org\javacc\jjtree\ASTRECharList.java" />
+    <delete file="${build.generated.sources.dir}\org\javacc\jjtree\ASTRENamed.java" />
+    <delete file="${build.generated.sources.dir}\org\javacc\jjtree\ASTREOneOrMore.java" />
+    <delete file="${build.generated.sources.dir}\org\javacc\jjtree\ASTREParenthesized.java" />
+    <delete file="${build.generated.sources.dir}\org\javacc\jjtree\ASTREReference.java" />
+    <delete file="${build.generated.sources.dir}\org\javacc\jjtree\ASTRESequence.java" />
+    <delete file="${build.generated.sources.dir}\org\javacc\jjtree\ASTRESpec.java" />
+    <delete file="${build.generated.sources.dir}\org\javacc\jjtree\ASTREStringLiteral.java" />
+    <delete file="${build.generated.sources.dir}\org\javacc\jjtree\ASTREZeroOrMore.java" />
+    <delete file="${build.generated.sources.dir}\org\javacc\jjtree\ASTREZeroOrOne.java" />
+    <delete file="${build.generated.sources.dir}\org\javacc\jjtree\ASTRRepetitionRange.java" />
+    <delete file="${build.generated.sources.dir}\org\javacc\jjtree\ASTBNFAction.java" />
+    <delete file="${build.generated.sources.dir}\org\javacc\jjtree\ASTBNFDeclaration.java" />
+    <delete file="${build.generated.sources.dir}\org\javacc\jjtree\ASTBNFNodeScope.java" />
+    <delete file="${build.generated.sources.dir}\org\javacc\jjtree\ASTCompilationUnit.java" />
+    <delete file="${build.generated.sources.dir}\org\javacc\jjtree\ASTExpansionNodeScope.java" />
+    <delete file="${build.generated.sources.dir}\org\javacc\jjtree\ASTGrammar.java" />
+    <delete file="${build.generated.sources.dir}\org\javacc\jjtree\ASTJavacode.java" />
+    <delete file="${build.generated.sources.dir}\org\javacc\jjtree\ASTJavacodeBody.java" />
+    <delete file="${build.generated.sources.dir}\org\javacc\jjtree\ASTLHS.java" />
+    <delete file="${build.generated.sources.dir}\org\javacc\jjtree\ASTNodeDescriptor.java" />
+    <delete file="${build.generated.sources.dir}\org\javacc\jjtree\ASTNodeDescriptorExpression.java" />
+    <delete file="${build.generated.sources.dir}\org\javacc\jjtree\ASTOptionBinding.java" />
+    <delete file="${build.generated.sources.dir}\org\javacc\jjtree\ASTOptions.java" />
+    <delete file="${build.generated.sources.dir}\org\javacc\jjtree\ASTProduction.java" />
+    <delete file="${build.generated.sources.dir}\org\javacc\jjtree\IO.java" />
+    <delete file="${build.generated.sources.dir}\org\javacc\jjtree\JJTree.java" />
+    <delete file="${build.generated.sources.dir}\org\javacc\jjtree\JJTreeGlobals.java" />
+    <delete file="${build.generated.sources.dir}\org\javacc\jjtree\JJTreeIOException.java" />
+    <delete file="${build.generated.sources.dir}\org\javacc\jjtree\JJTreeOptions.java" />
+    <delete file="${build.generated.sources.dir}\org\javacc\jjtree\JJTreeOptionsTest.java" />
+    <delete file="${build.generated.sources.dir}\org\javacc\jjtree\ASTTokenDecls.java" />
+    <delete file="${build.generated.sources.dir}\org\javacc\jjtree\JJTJJTreeParserState.java" />
+    <delete file="${build.generated.sources.dir}\org\javacc\jjtree\JJTreeParser.java" />
+    <delete file="${build.generated.sources.dir}\org\javacc\jjtree\JJTreeParserConstants.java" />
+    <delete file="${build.generated.sources.dir}\org\javacc\jjtree\JJTreeParserTokenManager.java" />
+    <delete file="${build.generated.sources.dir}\org\javacc\jjtree\JJTreeParserTreeConstants.java" />
+    <delete file="${build.generated.sources.dir}\org\javacc\jjtree\JJTreeParserVisitor.java" />
+    <delete file="${build.generated.sources.dir}\org\javacc\jjtree\JavaCharStream.java" />
+    <delete file="${build.generated.sources.dir}\org\javacc\jjtree\JJTreeState.java" />
+    <delete file="${build.generated.sources.dir}\org\javacc\jjtree\Main.java" />
+    <delete file="${build.generated.sources.dir}\org\javacc\jjtree\Node.java" />
+    <delete file="${build.generated.sources.dir}\org\javacc\jjtree\NodeFiles.java" />
+    <delete file="${build.generated.sources.dir}\org\javacc\jjtree\NodeScope.java" />
+    <delete file="${build.generated.sources.dir}\org\javacc\jjtree\SimpleNode.java" />
+    <delete file="${build.generated.sources.dir}\org\javacc\jjtree\Token.java" />
+    <delete file="${build.generated.sources.dir}\org\javacc\jjtree\ParseException.java" />
+    <delete file="${build.generated.sources.dir}\org\javacc\jjtree\TokenMgrError.java" />
+    <delete file="${build.generated.sources.dir}\org\javacc\jjtree\TokenUtils.java" />
+
+    <delete file="${build.generated.sources.dir}\org\javacc\jjtree\Token.java" />
+
+
+    <delete file="${build.generated.sources.dir}\javacc/Action.java" />
+    <delete file="${build.generated.sources.dir}\javacc/BNFProduction.java" />
+    <delete file="${build.generated.sources.dir}\javacc/CharacterRange.java" />
+    <delete file="${build.generated.sources.dir}\javacc/Choice.java" />
+    <delete file="${build.generated.sources.dir}\javacc/Container.java" />
+    <delete file="${build.generated.sources.dir}\javacc/Expansion.java" />
+    <delete file="${build.generated.sources.dir}\javacc/ExpansionTest.java" />
+    <delete file="${build.generated.sources.dir}\javacc/ExpansionTreeWalker.java" />
+    <delete file="${build.generated.sources.dir}\javacc/JavaCCErrors.java" />
+    <delete file="${build.generated.sources.dir}\javacc/JavaCCGlobals.java" />
+    <delete file="${build.generated.sources.dir}\javacc/JavaCCParserInternals.java" />
+    </target>
+    
+    <target name="-pre-jar">
+      
+    </target>
+</project>

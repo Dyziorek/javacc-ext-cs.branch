@@ -1,0 +1,25 @@
+
+/**
+ * An implementation of Error exception
+ */
+
+using System;
+
+/**
+ * exception class for critical exceptions
+ */
+
+#if NAMESPACE
+namespace ${NAMESPACE} {
+#fi
+
+public class Error : Exception {
+
+  public Error(string msg) : base (msg) { }
+  public Error() : base() { }
+
+}
+
+#if NAMESPACE
+}
+#fi
