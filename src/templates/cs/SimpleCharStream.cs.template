@@ -30,7 +30,7 @@ namespace ${NAMESPACE} {
     ${PREFIX}protected bool prevCharIsLF = false;
   #fi
 
-    ${PREFIX}protected System.IO.StreamReader inputStream;
+    ${PREFIX}protected System.IO.TextReader inputStream;
 
     ${PREFIX}protected char[] buffer;
     ${PREFIX}protected int maxNextCharInd = 0;
@@ -96,8 +96,9 @@ namespace ${NAMESPACE} {
       tokenBegin = 0;
     }
 
-    ${PREFIX}protected void FillBuff()
+    ${PREFIX}protected bool FillBuff()
     {
+      bool streamClosed = false;
       if (maxNextCharInd == available)
       {
         if (available == bufsize)
@@ -122,32 +123,55 @@ namespace ${NAMESPACE} {
 
       int i;
       try {
-        if ((i = inputStream.ReadBlock(buffer, maxNextCharInd, available - maxNextCharInd)) == 0)
+        if (null == inputStream)
         {
-             inputStream.Close();
-             throw new System.IO.IOException();
+            streamClosed = true;
         }
         else
-          maxNextCharInd += i;
-        return;
+        {
+            if ((i = inputStream.ReadBlock(buffer, maxNextCharInd, available - maxNextCharInd)) == 0)
+            {
+                 inputStream.Close();
+                 inputStream = null;
+                 streamClosed = true;
+            }
+            else
+            {
+              maxNextCharInd += i;
+            }
+        }
       }
-      catch(System.IO.IOException e) {
-        --bufpos;
-        backup(0);
-        if (tokenBegin == -1)
-          tokenBegin = bufpos;
-        throw e;
+      finally {
+        if (streamClosed)
+        {
+            --bufpos;
+            backup(0);
+            if (tokenBegin == -1)
+              tokenBegin = bufpos;
+        }
+      }
+      if (!streamClosed)
+      {
+          return true;
+      }
+      else
+      {
+          return false;
       }
     }
 
   /** Start. */
-    ${PREFIX}public char BeginToken() 
+    ${PREFIX}public bool BeginToken(ref char outChar) 
     {
       tokenBegin = -1;
-      char c = readChar();
-      tokenBegin = bufpos;
-
-      return c;
+      char c = '\0';
+      if (readChar(ref c))
+      {
+          tokenBegin = bufpos;
+          outChar = c;
+          return true;
+      }
+      return false;
     }
   #if KEEP_LINE_COLUMN
 
@@ -193,8 +217,9 @@ namespace ${NAMESPACE} {
   #fi
 
   /** Read a character. */
-    ${PREFIX}public char readChar()
+    ${PREFIX}public bool readChar(ref char curChar)
     {
+      bool bufferOK = true;
       if (inBuf > 0)
       {
         --inBuf;
@@ -202,18 +227,27 @@ namespace ${NAMESPACE} {
         if (++bufpos == bufsize)
           bufpos = 0;
 
-        return buffer[bufpos];
+        curChar = buffer[bufpos];
+        return true;
       }
 
       if (++bufpos >= maxNextCharInd)
-        FillBuff();
+      {
+         bufferOK = FillBuff();
+      }
+      if (!bufferOK)
+      {
+          curChar = '\0';
+          return false;
+      }
 
       char c = buffer[bufpos];
 
   #if KEEP_LINE_COLUMN
       UpdateLineColumn(c);
   #fi
-      return c;
+      curChar = c;
+      return true;
     }
 
   #if GENERATE_ANNOTATIONS
@@ -293,7 +327,7 @@ namespace ${NAMESPACE} {
     }
 
     /** Constructor. */
-    public SimpleCharStream(System.IO.StreamReader  dstream, int startline,
+    public SimpleCharStream(System.IO.TextReader  dstream, int startline,
     int startcolumn, int buffersize)
     {
   #if STATIC
@@ -317,20 +351,20 @@ namespace ${NAMESPACE} {
     }
 
     /** Constructor. */
-    public SimpleCharStream(System.IO.StreamReader dstream, int startline,
+    public SimpleCharStream(System.IO.TextReader dstream, int startline,
                             int startcolumn) : this(dstream, startline, startcolumn, 4096)
     {
       
     }
 
     /** Constructor. */
-    public SimpleCharStream(System.IO.StreamReader dstream) : this(dstream, 1, 1, 4096)
+    public SimpleCharStream(System.IO.TextReader dstream) : this(dstream, 1, 1, 4096)
     {
       
     }
 
     /** Reinitialise. */
-    public void ReInit(System.IO.StreamReader dstream, int startline,
+    public void ReInit(System.IO.TextReader dstream, int startline,
     int startcolumn, int buffersize)
     {
       inputStream = dstream;
@@ -356,14 +390,14 @@ namespace ${NAMESPACE} {
     }
 
     /** Reinitialise. */
-    public void ReInit(System.IO.StreamReader dstream, int startline,
+    public void ReInit(System.IO.TextReader dstream, int startline,
                        int startcolumn)
     {
       ReInit(dstream, startline, startcolumn, 4096);
     }
 
     /** Reinitialise. */
-    public void ReInit(System.IO.StreamReader dstream)
+    public void ReInit(System.IO.TextReader dstream)
     {
       ReInit(dstream, 1, 1, 4096);
     }

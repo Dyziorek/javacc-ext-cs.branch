@@ -701,11 +701,7 @@ public class LexGenCS extends LexGen {
     genCodeLine("");
     genCodeLine("  EOFLoop :\n  for (;;)");
     genCodeLine("  {");
-    genCodeLine("   try");
-    genCodeLine("   {");
-    genCodeLine("      curChar = input_stream.BeginToken();");
-    genCodeLine("   }");
-    genCodeLine("   catch(System.IO.IOException e)");
+    genCodeLine("   if (!input_stream.BeginToken(ref curChar))");
     genCodeLine("   {");
 
     if (Options.getDebugTokenManager())
@@ -1001,8 +997,8 @@ public class LexGenCS extends LexGen {
           genCodeLine(prefix + "      curPos = 0;");
           genCodeLine(prefix + "      jjmatchedKind = 0x" + Integer.toHexString(Integer.MAX_VALUE) + ";");
 
-          genCodeLine(prefix + "      try {");
-          genCodeLine(prefix + "         curChar = input_stream.readChar();");
+          genCodeLine(prefix + "      if (input_stream.readChar(ref curChar))");
+          genCodeLine(prefix + "         {");
 
           if (Options.getDebugTokenManager())
             genCodeLine("   debugStream.WriteLine(" +
@@ -1012,7 +1008,6 @@ public class LexGenCS extends LexGen {
             "at line \" + input_stream.getEndLine() + \" column \" + input_stream.getEndColumn());");
           genCodeLine(prefix + "         continue;");
           genCodeLine(prefix + "      }");
-          genCodeLine(prefix + "      catch (System.IO.IOException e1) { }");
         }
       }
 
@@ -1021,8 +1016,13 @@ public class LexGenCS extends LexGen {
       genCodeLine(prefix + "   int error_column = input_stream.getEndColumn();");
       genCodeLine(prefix + "   String error_after = null;");
       genCodeLine(prefix + "   " + Options.getBooleanType() + " EOFSeen = false;");
-      genCodeLine(prefix + "   try { input_stream.readChar(); input_stream.backup(1); }");
-      genCodeLine(prefix + "   catch (System.IO.IOException e1) {");
+      genCodeLine(prefix + "   char errChar = 'E';");
+      genCodeLine(prefix + "   if (input_stream.readChar(ref errChar))");
+      genCodeLine(prefix + "   { ");
+      genCodeLine(prefix + "     input_stream.backup(1); ");
+      genCodeLine(prefix + "   }");
+      genCodeLine(prefix + "   else");
+      genCodeLine(prefix + "   {");
       genCodeLine(prefix + "      EOFSeen = true;");
       genCodeLine(prefix + "      error_after = curPos <= 1 ? \"\" : input_stream.GetImage();");
       genCodeLine(prefix + "      if (curChar == '\\n' || curChar == '\\r') {");

@@ -2898,8 +2898,8 @@ public class NfaState
            codeGenerator.genCodeLine("   catch(java.io.IOException e) { throw new Error(\"Internal Error\"); }");
          } else if (codeGenerator.isCSLanguage()) {
            codeGenerator.genCodeLine("   input_stream.backup(seenUpto = curPos + 1);");
-           codeGenerator.genCodeLine("   try { curChar = input_stream.readChar(); }");
-           codeGenerator.genCodeLine("   catch(System.IO.IOException e) { throw new Exception(\"Internal Error\"); }");
+           codeGenerator.genCodeLine("   if (!input_stream.readChar(ref curChar))");
+           codeGenerator.genCodeLine("   { throw new Exception(\"Internal Error\"); }");
          }else {
            codeGenerator.genCodeLine("   input_stream->backup(seenUpto = curPos + 1);");
            codeGenerator.genCodeLine("   assert(!input_stream->endOfInput());");
@@ -3027,8 +3027,11 @@ public class NfaState
         }
       }
 
-      if (codeGenerator.isJavaLanguage() || codeGenerator.isCSLanguage()) {
-        codeGenerator.genCodeLine("      try { curChar = input_stream.readChar(); }");
+      if (codeGenerator.isJavaLanguage()) {
+          codeGenerator.genCodeLine("      try { curChar = input_stream.readChar(); }");
+      }
+      else if (codeGenerator.isCSLanguage()) {
+        codeGenerator.genCodeLine("      if (!input_stream.readChar(ref curChar))");
       } else {
         if (Main.lg.mixed[Main.lg.lexStateIndex]) {
           codeGenerator.genCodeLine("      if (input_stream->endOfInput()) { break; }");
@@ -3043,14 +3046,14 @@ public class NfaState
           codeGenerator.genCodeLine("      catch(java.io.IOException e) { break; }");
         } else if (codeGenerator.isCSLanguage())
         {
-          codeGenerator.genCodeLine("      catch(System.IO.IOException e) { break; }");
+          codeGenerator.genCodeLine("      { break; }");
         }
       } else {
         if (codeGenerator.isJavaLanguage()) {
           codeGenerator.genCodeLine("      catch(java.io.IOException e) { return curPos; }");
         }else if (codeGenerator.isCSLanguage())
         {
-          codeGenerator.genCodeLine("      catch(System.IO.IOException e) { return curPos; }");
+          codeGenerator.genCodeLine("      { return curPos; }");
         }
       }
 
@@ -3098,8 +3101,8 @@ public class NfaState
                  "throw new Error(\"Internal Error : Please send a bug report.\"); }");
          } else if (codeGenerator.isCSLanguage()) {
            codeGenerator.genCodeLine("      for (i = toRet - Math.Min(curPos, seenUpto); i-- > 0; )");
-         codeGenerator.genCodeLine("         try { curChar = input_stream.readChar(); }");
-         codeGenerator.genCodeLine("         catch(System.IO.IOException e) { " +
+         codeGenerator.genCodeLine("         if (!input_stream.readChar(ref curChar))");
+         codeGenerator.genCodeLine("         { " +
                  "throw new Exception(\"Internal Error : Please send a bug report.\"); }");
          }else {
            codeGenerator.genCodeLine("      for (i = toRet - MIN(curPos, seenUpto); i-- > 0; )");

@@ -677,8 +677,8 @@ public class RStringLiteral extends RegularExpression {
        codeGenerator.genCodeLine("   catch(java.io.IOException e) { return pos + 1; }");
      } else if(Options.getOutputLanguage().equals("cs"))
      {
-       codeGenerator.genCodeLine("   try { curChar = input_stream.readChar(); }");
-       codeGenerator.genCodeLine("   catch(System.IO.IOException e) { return pos + 1; }");
+       codeGenerator.genCodeLine("   if (!input_stream.readChar(ref curChar))");
+       codeGenerator.genCodeLine("   { return pos + 1; }");
      }
      else {
        codeGenerator.genCodeLine("   if (input_stream->endOfInput()) { return pos + 1; }");
@@ -967,8 +967,8 @@ public class RStringLiteral extends RegularExpression {
              codeGenerator.genCodeLine("   try { curChar = input_stream.readChar(); }");
              codeGenerator.genCodeLine("   catch(java.io.IOException e) {");
            } else if (Options.getOutputLanguage().equals("cs")) {
-             codeGenerator.genCodeLine("   try { curChar = input_stream.readChar(); }");
-             codeGenerator.genCodeLine("   catch(System.IO.IOException e) {");
+             codeGenerator.genCodeLine("   if (!input_stream.readChar(ref curChar))");
+             codeGenerator.genCodeLine("   {");
            }
            else {
              codeGenerator.genCodeLine("   if (input_stream->endOfInput()) {");

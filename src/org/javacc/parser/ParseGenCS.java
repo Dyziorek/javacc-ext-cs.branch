@@ -530,7 +530,7 @@ public class ParseGenCS extends CodeGenerator implements JavaCCParserConstants {
           genCodeLine("    trace_scan(jj_scanpos, kind);");
         }
         genCodeLine("    if (jj_scanpos.kind != kind) return true;");
-        genCodeLine("    if (jj_la == 0 && jj_scanpos == jj_lastpos) throw jj_ls;");
+        genCodeLine("    if (jj_la == 0 && jj_scanpos == jj_lastpos) return false;");
         genCodeLine("    return false;");
         genCodeLine("  }");
         genCodeLine("");
