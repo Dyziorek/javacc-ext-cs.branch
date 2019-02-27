@@ -1,12 +1,12 @@
   ${STATIC?static :}int kindCnt = 0;
-  protected ${STATIC?static :} String jjKindsForBitVector(int i, long vec)
+  protected ${STATIC?static :} String jjKindsForBitVector(int i, ulong vec)
   {
     String retVal = "";
     if (i == 0)
        kindCnt = 0;
     for (int j = 0; j < 64; j++)
     {
-       if ((vec & (1L << j)) != 0L)
+       if ((vec & (1UL << j)) != 0L)
        {
           if (kindCnt++ > 0)
              retVal += ", ";
@@ -29,7 +29,7 @@
      if (vec[i] == -1)
        continue;
      int[] stateSet = statesForState[curLexState][vec[i]];
-     for (int j = 0; j < stateSet.length; j++)
+     for (int j = 0; j < stateSet.Length; j++)
      {
        int state = stateSet[j];
        if (!kindDone[kindForState[lexState][state]])

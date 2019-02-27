@@ -44,7 +44,7 @@ ${SUPPORT_CLASS_VISIBILITY_PUBLIC?public :}class TokenMgrError : Error
    * Replaces unprintable characters by their escaped (or unicode escaped)
    * equivalents in the given string
    */
-  protected static String addEscapes(String str) {
+  public static String addEscapes(String str) {
     System.Text.StringBuilder retval = new System.Text.StringBuilder();
     char ch;
     for (int i = 0; i < str.Length; i++) {

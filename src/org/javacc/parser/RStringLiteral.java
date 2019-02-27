@@ -695,7 +695,7 @@ public class RStringLiteral extends RegularExpression {
          codeGenerator.genCodeLine("   Debug.WriteLine(" +
               (LexGen.maxLexStates > 1 ? "\"<\" + lexStateNames[curLexState] + \">\" + " : "") +
               "\"Current character : \" + " +
-              "TokenMgrError.addEscapes(String.valueOf(curChar)) + \" (\" + (int)curChar + \") " +
+              "TokenMgrError.addEscapes(System.Convert.ToString(curChar)) + \" (\" + (int)curChar + \") " +
               "at line \" + input_stream.getEndLine() + \" column \" + input_stream.getEndColumn());");
        }
        else {
@@ -1024,10 +1024,10 @@ public class RStringLiteral extends RegularExpression {
                    "TokenMgrError.addEscapes(String.valueOf(curChar)) + \" (\" + (int)curChar + \") " +
                    "at line \" + input_stream.getEndLine() + \" column \" + input_stream.getEndColumn());");
           } else if (codeGenerator.isCSLanguage()) {
-            codeGenerator.genCodeLine("   debugStream.WrieLine(" +
+            codeGenerator.genCodeLine("   debugStream.WriteLine(" +
               (LexGen.maxLexStates > 1 ? "\"<\" + lexStateNames[curLexState] + \">\" + " : "") +
                    "\"Current character : \" + " +
-                   "TokenMgrError.addEscapes(String.valueOf(curChar)) + \" (\" + (int)curChar + \") " +
+                   "TokenMgrError.addEscapes(System.Convert.ToString(curChar)) + \" (\" + (int)curChar + \") " +
                    "at line \" + input_stream.getEndLine() + \" column \" + input_stream.getEndColumn());");
           } else {
             codeGenerator.genCodeLine("   fprintf(debugStream, " +

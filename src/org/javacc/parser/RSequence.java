@@ -76,6 +76,7 @@ public class RSequence extends RegularExpression {
 
   RSequence()
   {
+    units = new ArrayList();
   }
 
   RSequence(List seq)

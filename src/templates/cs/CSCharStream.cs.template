@@ -145,7 +145,7 @@ class CSCharStream
     tokenBegin = 0;
   }
 
-  ${PREFIX}protected void FillBuff() 
+  ${PREFIX}protected bool FillBuff() 
   {
     int i;
     if (maxNextCharInd == 4096)
@@ -188,8 +188,9 @@ class CSCharStream
   }
 
 /** @return starting character for token. */
-  ${PREFIX}public char BeginToken() 
+  ${PREFIX}bool BeginToken(ref char charLoaded) 
   {
+    char c = '\0';
     if (inBuf > 0)
     {
       --inBuf;
@@ -198,7 +199,8 @@ class CSCharStream
         bufpos = 0;
 
       tokenBegin = bufpos;
-      return buffer[bufpos];
+      charLoaded = buffer[bufpos];
+      return true;
     }
 
     tokenBegin = 0;
@@ -270,7 +272,7 @@ class CSCharStream
 #fi
 
 /** Read a character. */
-  ${PREFIX}public char readChar() 
+  ${PREFIX}public bool readChar(ref char curChar) 
   {
     if (inBuf > 0)
     {
@@ -278,8 +280,8 @@ class CSCharStream
 
       if (++bufpos == bufsize)
         bufpos = 0;
-
-      return buffer[bufpos];
+      curChar = buffer[bufpos];
+      return true;
     }
 
     char c;
@@ -315,7 +317,8 @@ class CSCharStream
             }
 
             backup(backSlashCnt);
-            return '\\';
+            curChar = '\\';
+            return true;
           }
         }
         catch(java.io.IOException e)
@@ -323,8 +326,8 @@ class CSCharStream
 	  // We are returning one backslash so we should only backup (count-1)
           if (backSlashCnt > 1)
             backup(backSlashCnt-1);
-
-          return '\\';
+          curChar = '\\';
+          return true;
         }
 
 #if KEEP_LINE_COLUMN

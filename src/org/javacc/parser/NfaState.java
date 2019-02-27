@@ -1679,7 +1679,13 @@ public class NfaState
          {
            codeGenerator.genCodeLine("         int hiByte = (curChar >> 8);");
            codeGenerator.genCodeLine("         int i1 = hiByte >> 6;");
+        if (codeGenerator.isCSLanguage()) { 
+            codeGenerator.genCodeLine("         " + Options.getLongType() + " l1 = 1UL << (hiByte & 0x3F);");
+        }
+        else
+        {
            codeGenerator.genCodeLine("         " + Options.getLongType() + " l1 = 1L << (hiByte & 077);");
+            }
          }
 
          codeGenerator.genCodeLine("         int i2 = (curChar & 0xff) >> 6;");
@@ -3068,7 +3074,7 @@ public class NfaState
           codeGenerator.genCodeLine("      debugStream.WriteLine(" + (LexGen.maxLexStates > 1 ?
                  "\"<\" + lexStateNames[curLexState] + \">\" + " :
                  "") + "\"Current character : \" + " +
-                 "TokenMgrError.addEscapes(String.valueOf(curChar)) + \" (\" + (int)curChar + \") " +
+                 "TokenMgrError.addEscapes(System.Convert.ToString(curChar)) + \" (\" + (int)curChar + \") " +
                  "at line \" + input_stream.getEndLine() + \" column \" + input_stream.getEndColumn());");
         } else {
           codeGenerator.genCodeLine("   fprintf(debugStream, " +
@@ -3211,11 +3217,25 @@ public class NfaState
       {
        if (statesForState[i] == null)
        {
+           if (codeGenerator.isCSLanguage())
+           {
+            codeGenerator.genCodeLine(" new int[][] {},");
+           }
+           else
+           {
           codeGenerator.genCodeLine(" {},");
+           }
           continue;
        }
 
-       codeGenerator.genCodeLine(" {");
+        if (codeGenerator.isCSLanguage())
+           {
+            codeGenerator.genCodeLine(" new int[][] {");   
+           }
+        else
+        {
+            codeGenerator.genCodeLine(" {");
+        }
 
        for (int j = 0; j < statesForState[i].length; j++)
        {
@@ -3223,11 +3243,24 @@ public class NfaState
 
          if (stateSet == null)
          {
-            codeGenerator.genCodeLine("   { " + j + " },");
+              if (codeGenerator.isCSLanguage())
+           {
+            codeGenerator.genCodeLine(" new int[] { " + j + " },");   
+           }
+              else
+              {
+            codeGenerator.genCodeLine("  { " + j + " },");
+              }
             continue;
          }
-
+          if (codeGenerator.isCSLanguage())
+           {
+               codeGenerator.genCode(" new int[]  { ");
+           }
+          else
+          {
          codeGenerator.genCode("   { ");
+          }
 
          for (int k = 0; k < stateSet.length; k++)
             codeGenerator.genCode(stateSet[k] + ", ");
@@ -3266,20 +3299,33 @@ public class NfaState
          return;
       }
       else
+      {
          codeGenerator.genCodeLine("{");
-
+      }
       for (int i = 0; i < kinds.length; i++)
       {
          if (moreThanOne)
             codeGenerator.genCodeLine(",");
          moreThanOne = true;
 
-         if (kinds[i] == null)
+         if (kinds[i] == null){
+             if (codeGenerator.isCSLanguage()) {
+                 codeGenerator.genCodeLine("new int[] {}");
+             }
+             else{
             codeGenerator.genCodeLine("{}");
+             }
+         }
          else
          {
             cnt = 0;
-            codeGenerator.genCode("{ ");
+            if (codeGenerator.isCSLanguage()) {
+                codeGenerator.genCode(" new int[] { ");
+            }
+            else
+            {
+             codeGenerator.genCode("{ ");
+            }
             for (int j = 0; j < kinds[i].length; j++)
             {
                if (cnt % 15 == 0)

@@ -29,7 +29,7 @@ interface CharStream {
    * of selecting the input is the responsibility of the class
    * implementing this interface.  Can throw any java.io.IOException.
    */
-  char readChar() 
+  bool readChar(ref outChar) 
 
 #if GENERATE_ANNOTATIONS
   [Obsolete("use getEndColumn")]
@@ -88,7 +88,7 @@ interface CharStream {
    * All characters must remain in the buffer between two successive calls
    * to this method to implement backup correctly.
    */
-  char BeginToken() 
+  bool BeginToken(ref char charLoaded) 
 
   /**
    * Returns a string made up of characters from the marked token beginning

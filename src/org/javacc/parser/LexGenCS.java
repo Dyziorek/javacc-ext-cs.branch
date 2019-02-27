@@ -796,10 +796,31 @@ public class LexGenCS extends LexGen {
               (maxLexStates > 1 ?
                   "\"<\" + lexStateNames[curLexState] + \">\" + " : "") +
                   "\"Skipping character : \" + " +
-          "TokenMgrError.addEscapes(String.valueOf(curChar)) + \" (\" + (int)curChar + \")\");");
+          "TokenMgrError.addEscapes(System.Convert.ToString(curChar)) + \" (\" + (int)curChar + \")\");");
         }
-        genCodeLine(prefix + "      curChar = input_stream.BeginToken();");
+        genCodeLine(prefix + "      if (!input_stream.BeginToken(ref curChar))");
 
+        genCodeLine("         {");
+
+        if (Options.getDebugTokenManager())
+          genCodeLine("            debugStream.WriteLine(\"Returning the <EOF> token.\\n\");");
+
+        genCodeLine("            jjmatchedKind = 0;");
+        genCodeLine("            jjmatchedPos = -1;");
+        genCodeLine("            matchedToken = jjFillToken();");
+
+        if (hasSpecial)
+          genCodeLine("            matchedToken.specialToken = specialToken;");
+
+        if (nextStateForEof != null || actForEof != null)
+          genCodeLine("            TokenLexicalActions(matchedToken);");
+
+        if (Options.getCommonTokenAction())
+          genCodeLine("            CommonTokenAction(matchedToken);");
+
+        genCodeLine("            return matchedToken;");
+        genCodeLine("         }");
+        
         if (Options.getDebugTokenManager())
           genCodeLine(prefix + "}");
 
@@ -827,7 +848,7 @@ public class LexGenCS extends LexGen {
         genCodeLine("      debugStream.WriteLine(" +
             (maxLexStates > 1 ? "\"<\" + lexStateNames[curLexState] + \">\" + " : "") +
             "\"Current character : \" + " +
-            "TokenMgrError.addEscapes(String.valueOf(curChar)) + \" (\" + (int)curChar + \") " +
+            "TokenMgrError.addEscapes(System.Convert.ToString(curChar)) + \" (\" + (int)curChar + \") " +
         "at line \" + input_stream.getEndLine() + \" column \" + input_stream.getEndColumn());");
 
       genCodeLine(prefix + "curPos = jjMoveStringLiteralDfa0_" + i + "();");
@@ -1004,7 +1025,7 @@ public class LexGenCS extends LexGen {
             genCodeLine("   debugStream.WriteLine(" +
                 (maxLexStates > 1 ? "\"<\" + lexStateNames[curLexState] + \">\" + " : "") +
                 "\"Current character : \" + " +
-                "TokenMgrError.addEscapes(String.valueOf(curChar)) + \" (\" + (int)curChar + \") " +
+                "TokenMgrError.addEscapes(System.Convert.ToString(curChar)) + \" (\" + (int)curChar + \") " +
             "at line \" + input_stream.getEndLine() + \" column \" + input_stream.getEndColumn());");
           genCodeLine(prefix + "         continue;");
           genCodeLine(prefix + "      }");
