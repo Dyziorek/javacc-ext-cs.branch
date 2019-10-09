@@ -1,0 +1,215 @@
+
+options {
+  JAVA_UNICODE_ESCAPE = false;
+  ERROR_REPORTING = false;
+  STATIC = false;
+  IGNORE_CASE = true;
+  NAMESPACE="JSONLook";
+  OUTPUT_LANGUAGE="cs";
+  IGNORE_PARASOFT_ANALYSIS = true;
+}
+
+
+PARSER_BEGIN(JSONParser)
+
+using System;
+using System.IO;
+using System.Collections;
+using System.Collections.Generic;
+
+/**
+ * Grammar to parse JSON Data
+ * @author Daniel Dus
+ */
+public class JSONParser 
+{
+    public static void JSON_parse(string inputText)
+    {
+        MemoryStream strm = new MemoryStream(System.Text.Encoding.ASCII.GetBytes(inputText));
+        SimpleCharStream strmchr = new SimpleCharStream(strm);
+        JSONParserTokenManager tokenizer = new JSONParserTokenManager(strmchr);
+        JSONParser parser = new JSONParser(tokenizer);
+        parser.enable_tracing();
+        parser.jsonText();
+    }
+
+	public void setActionWorker(IParseActions worker)
+	{
+		_worker = worker;
+	}
+
+	private IParseActions _worker;
+}
+
+PARSER_END(JSONParser)
+
+/* LEXER RULES */
+
+// White space to ignore
+SPECIAL_TOKEN:
+{
+  " "
+| "\t"
+| "\n"
+| "\r"
+| "\f"
+}
+
+
+TOKEN:
+{
+   <TRUE: "true">
+   |<FALSE: "false">
+   |<NULL: "null">
+   |<LPAREN: "(">
+   |<RPAREN: ")">
+   |<LBRACE: "{">
+   |<RBRACE: "}">
+   |<LBRACKET: "[">
+   |<RBRACKET: "]">
+   |<COMMA: ",">
+   |<DOT: "."> 
+   |<COLON: ":">
+   |<SLASH: "/">
+   |<BACKSLASH: "\\">
+
+}
+
+/* LITERALS */
+
+
+TOKEN :
+{
+
+ <NUMBER: (["-"])? <NUMBER_LITERAL> >
+ |
+ < #NUMBER_LITERAL: ["0"-"9"] (["0"-"9"])* ((".")? (["0"-"9"])* | ("e|E")? (["0"-"9"])*)  >
+|
+<STRING : <STRING_LITERAL> >
+|
+  < #STRING_LITERAL:
+      "\""
+      (   (~["\""])
+        | ("\\"
+            ( ["n","t","b","r","f","\\","'","\""]
+            | ["0"-"7"] ( ["0"-"7"] )?
+            | ["0"-"3"] ["0"-"7"] ["0"-"7"]
+            )
+          )
+        | ("\\u"
+        	["0"-"9","A"-"F","a"-"f"]
+        	["0"-"9","A"-"F","a"-"f"]
+        	["0"-"9","A"-"F","a"-"f"]
+        	["0"-"9","A"-"F","a"-"f"]
+          )
+      )*
+      "\""
+  >
+}
+
+
+
+void jsonText() :
+{
+}
+{
+    jsonValue()
+	<EOF>
+}
+
+void jsonValue() :
+{
+	Token retVal = null;
+}
+{
+    (retVal = <NULL>
+    |retVal = <TRUE>
+    |retVal = <FALSE>
+    |retVal = <STRING>
+    |retVal = <NUMBER>
+    |jsonObject()
+    |jsonArray()
+	)
+	{
+		if (retVal != null)
+		{
+			_worker.addValue(retVal);
+		}
+	}
+}
+
+
+
+void jsonObject() :
+{}
+{
+    LOOKAHEAD(2)
+	{
+		_worker.openObject();
+	}
+	<LBRACE> <RBRACE>
+    |
+   	{
+		_worker.openObject();
+	}
+	<LBRACE> jsonMemberList() <RBRACE>
+
+	{
+		_worker.closeObject();
+	}
+}
+
+void jsonArray() :
+{}
+{
+	LOOKAHEAD(2)
+	{ _worker.openArray();}
+	<LBRACKET> <RBRACKET>
+	{ _worker.closeArray();}
+	|
+	{ _worker.openArray();}
+	<LBRACKET> jsonElementList() <RBRACKET>
+	{ _worker.closeArray();}
+}
+
+void jsonElementList() :
+{}
+{
+    jsonValue() (<COMMA> jsonValue())*
+	
+}
+
+string jsonMember() :
+{
+Token stringName = null;
+}
+{
+	stringName = <STRING> <COLON> jsonValue()
+
+	{return stringName.image;}
+}
+
+void jsonMemberList() :
+{
+List<String> memebers = new List<String>();
+string memberName = null;
+}
+{
+   memberName = jsonMember() {
+   memebers.Add(memberName);
+   _worker.addMember(memberName);
+    } (<COMMA> memberName = jsonMember() {memebers.Add(memberName); _worker.addMember(memberName); } )*
+
+   {
+   /*cs
+		foreach(String meme in memebers)
+		{
+			System.Console.Out.WriteLine(meme);
+		}
+		System.Console.Out.WriteLine();
+	*/
+		
+   }
+}
+
+
