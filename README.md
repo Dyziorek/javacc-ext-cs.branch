@@ -8,7 +8,7 @@ Sample grammars:
 \test.tmp\cssStyle.jj  - grammar for parse CSS files.
 \test.tmp\jsonCheck.jj  - grammar for decoding json files.
 
-#IntelliJ branch
+# IntelliJ branch
 This is IntelliJ branch which moves project from NetBeans project system into IntelliJ project.
 
 # Building project
