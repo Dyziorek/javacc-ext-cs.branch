@@ -7,3 +7,6 @@ to generate new language and source modifications are neccessary.
 In the samples there is example of parsing CSS style files.
 
 Automatically exported from code.google.com/p/javacc-ext-cs.branch
+
+### Note: 
+### It is recommened to clone intelliJ branch instead of master. Master is left for compatibilty reasons
