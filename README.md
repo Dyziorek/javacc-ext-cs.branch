@@ -6,6 +6,7 @@ to generate new language and source modifications are neccessary.
 Sample grammars:
 
 \test.tmp\cssStyle.jj  - grammar for parse CSS files.
+
 \test.tmp\jsonCheck.jj  - grammar for decoding json files.
 
 # IntelliJ branch
@@ -15,6 +16,7 @@ This is IntelliJ branch which moves project from NetBeans project system into In
 
 1. Clone this branch into local repository
 2. Run gradlew.bat (on Windows) gradlew (on Linux) with jar argument:
+```
    > gradlew.bat jar
-
+```
 
