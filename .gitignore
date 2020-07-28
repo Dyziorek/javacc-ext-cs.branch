@@ -139,3 +139,7 @@ gradle-app.setting
 
 ### Specific project settings ###
 !bootstrap/javacc.jar
+
+### Ignore generated code in test.tmp
+test.tmp/*.cs
+test.tmp/*.java

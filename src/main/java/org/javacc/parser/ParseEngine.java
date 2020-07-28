@@ -594,7 +594,7 @@ public class ParseEngine {
       generateCPPMethodheader(p, t);
     }
 
-    codeGenerator.genCode(" {");
+    codeGenerator.genCode(" {\n");
     indentamt = 4;
     if (Options.getDebugParser()) {
       codeGenerator.genCodeLine("");
