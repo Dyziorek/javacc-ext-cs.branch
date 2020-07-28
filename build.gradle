@@ -1,5 +1,6 @@
 plugins {
     id 'java'
+    id 'application'
 }
 
 version '1.0'
@@ -70,11 +71,12 @@ sourceSets {
     }
 }
 
-jar {
-    from ("src/main/templates") {
+
+processResources {
+    from ("src/templates") {
         into ("templates/")
     }
-    
+
     from ("src/" ){
         include("*.properties")
     }
@@ -95,4 +97,68 @@ jar {
         include("*.jj")
         into ("org/javacc/jjtree/")
     }
+}
+
+//jar {
+//    from ("src/main/templates") {
+//        into ("templates/")
+//    }
+//
+//    from ("src/" ){
+//        include("*.properties")
+//    }
+//
+//    from ("src/main/java/org/javacc/parser" ){
+//        include("*.jj")
+//        into ("org/javacc/parser/")
+//    }
+//    from ("src/main/java/org/javacc/utils" ){
+//        include("*.jj")
+//        into ("org/javacc/utils/")
+//    }
+//    from ("src/main/java/org/javacc/jjtree" ){
+//        include("*.jjt")
+//        into ("org/javacc/jjtree/")
+//    }
+//    from ("build/generated-sources/main/java/org/javacc/jjtree" ){
+//        include("*.jj")
+//        into ("org/javacc/jjtree/")
+//    }
+//}
+
+application {
+    mainClassName = 'javacc'
+    executableDir = "${rootDir}/test.tmp"
+}
+
+task runCSS (type: JavaExec) {
+        classpath = files(jar.archivePath)
+        main = "javacc";
+        args = [
+                "cssStyle.jj"
+        ]
+        workingDir = "${rootDir}/test.tmp"
+}
+
+task runJson (type: JavaExec) {
+    classpath = files(jar.archivePath)
+    main = "javacc";
+    args = [
+            "jsonCheck.jj"
+    ]
+    workingDir = "${rootDir}/test.tmp"
+}
+
+task runTests{
+    doLast {
+        println "Tests Done"
+    }
+}
+
+runJson.dependsOn runCSS
+runTests.dependsOn runJson
+
+project.afterEvaluate {
+    println "java = " + sourceSets.main.java.source
+    println "resource = " + sourceSets.main.resources.source
 }
