@@ -573,8 +573,7 @@ public class ParseGenCS extends CodeGenerator implements JavaCCParserConstants {
         genCodeLine("  " + staticOpt() + "private int jj_ntk_f() {");
         genCodeLine("    if ((jj_nt=token.next) == null)");
         genCodeLine("      return (jj_ntk = (token.next=token_source.getNextToken()).kind);");
-        genCodeLine("    else");
-        genCodeLine("      return (jj_ntk = jj_nt.kind);");
+        genCodeLine("    return (jj_ntk = jj_nt.kind);");
         genCodeLine("  }");
         genCodeLine("");
       }

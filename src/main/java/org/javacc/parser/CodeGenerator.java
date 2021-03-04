@@ -47,6 +47,21 @@ public class CodeGenerator {
     }
   }
 
+  public void updateCol(int col)
+  {
+    ccol = col;
+  }
+
+  public void updateLine(int line)
+  {
+    cline = line;
+  }
+
+  public void backLine()
+  {
+    cline--;
+  }
+
   public void saveOutput(String fileName) {
     if (!(isJavaLanguage() || isCSLanguage())) {
       String incfileName = fileName.replace(".cc", ".h");

@@ -604,6 +604,7 @@ public class ParseEngine {
     }
     if (p.getDeclarationTokens().size() != 0) {
       codeGenerator.printTokenSetup((Token)(p.getDeclarationTokens().get(0))); cline--;
+      codeGenerator.updateCol(1);
       for (Iterator it = p.getDeclarationTokens().iterator(); it.hasNext();) {
         t = (Token)it.next();
         codeGenerator.printToken(t);
@@ -1333,6 +1334,7 @@ public class ParseEngine {
         }
         if (jp.getCodeTokens().size() != 0) {
           codeGenerator.printTokenSetup((Token)(jp.getCodeTokens().get(0))); cline--;
+          codeGenerator.backLine();
           codeGenerator.printTokenList(jp.getCodeTokens());
         }
         codeGenerator.genCodeLine("");

@@ -117,16 +117,46 @@ void jsonText() :
 	<EOF>
 }
 
+JAVACODE
+boolean tabledefpar()
+{
+  int tokenWatch = 1;
+  boolean retControl = true;
+
+  if (getToken(1).kind != RTFParserConstants.PARD)
+      return false;
+
+  return retControl;
+}
+
+JAVACODE
+void nesttable() throws UnsupportedEncodingException
+{
+  //Token beginNestTable = null, endNestTable = null;
+  //beginNestTable = getToken(1);
+  //endNestTable = getToken(0);
+  // finalizing maybe exists texts after nested table
+   while (true)
+   {
+    if (getToken(1).kind == 10)
+    {
+        break;
+    }
+   }
+ 
+}
+
 void jsonValue() :
 {
-	Token retVal = null;
+  Token retVal = null;
+  Token callVal = null;
 }
 {
     (retVal = <NULL>
     |retVal = <TRUE>
     |retVal = <FALSE>
     |retVal = <STRING>
-    |retVal = <NUMBER>
+    |callVal = <NUMBER>
     |jsonObject()
     |jsonArray()
 	)
@@ -135,6 +165,10 @@ void jsonValue() :
 		{
 			_worker.addValue(retVal);
 		}
+		if (callVal != null)
+        {
+            _worker.addValue(callVal);
+        }
 	}
 }
 

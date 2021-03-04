@@ -3,7 +3,7 @@ plugins {
     id 'application'
 }
 
-version '1.0'
+version '1'
 
 sourceCompatibility = 1.8
 
@@ -125,6 +125,10 @@ processResources {
 //        into ("org/javacc/jjtree/")
 //    }
 //}
+jar
+{
+    archiveName 'javacc1.jar'
+}
 
 application {
     mainClassName = 'javacc'
@@ -161,4 +165,12 @@ runTests.dependsOn runJson
 project.afterEvaluate {
     println "java = " + sourceSets.main.java.source
     println "resource = " + sourceSets.main.resources.source
+    println "jar =" + jar.archivePath
 }
+
+//task myCopy(type: Copy) {
+//    outputs.upToDateWhen { false }
+//    from(jar.archivePath)
+//    into("C:\\gene_4X\\nd_src\\gene\\apps\\gcm\\src\\ws\\gene-rtf\\src\\main\\java\\com\\scc\\genertf\\processor")
+//    include('*.jar')
+//}
